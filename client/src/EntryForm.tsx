@@ -109,7 +109,9 @@ export default function EntryForm({ entry, onSubmit }: Props) {
           className="modal-container d-flex justify-center align-center">
           <div className="modal row">
             <div className="column-full d-flex justify-center">
-              <p>Are you sure you want to delete this entry?</p>
+              <p className="modal-message">
+                Are you sure you want to delete this entry?
+              </p>
             </div>
             <div className="column-full d-flex justify-between">
               <button
