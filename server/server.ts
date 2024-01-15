@@ -110,6 +110,8 @@ app.delete('/api/entries/:entryId', async (req, res, next) => {
   }
 });
 
+app.use(errorMiddleware);
+
 app.listen(process.env.PORT, () => {
   console.log(`express server listening on port ${process.env.PORT}`);
 });
