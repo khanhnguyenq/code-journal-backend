@@ -57,6 +57,59 @@ app.post('/api/entries', async (req, res, next) => {
   }
 });
 
+app.put('/api/entries/:entryId', async (req, res, next) => {
+  try {
+    const entryId = Number(req.params.entryId);
+    const { title, notes, photoUrl } = req.body as Partial<Entry>;
+    if (!Number.isInteger(entryId) || !title || !notes || !photoUrl) {
+      throw new ClientError(
+        400,
+        'entryId, title, notes, and photoUrl are required fields'
+      );
+    }
+    const sql = `
+      update "entries"
+        set "title" = $1,
+            "notes" = $2,
+            "photoUrl" = $3
+        where "entryId" = $4
+        returning *;
+    `;
+    const params = [title, notes, photoUrl, entryId];
+    const result = await db.query<Entry>(sql, params);
+    const [entry] = result.rows;
+    if (!entry) {
+      throw new ClientError(404, `Entry with id ${entryId} not found`);
+    }
+    res.status(201).json(entry);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.delete('/api/entries/:entryId', async (req, res, next) => {
+  try {
+    const entryId = Number(req.params.entryId);
+    if (!Number.isInteger(entryId)) {
+      throw new ClientError(400, 'entryId must be an integer');
+    }
+    const sql = `
+      delete from "entries"
+        where "entryId" = $1
+        returning *;
+    `;
+    const params = [entryId];
+    const result = await db.query<Entry>(sql, params);
+    const [deleted] = result.rows;
+    if (!deleted) {
+      throw new ClientError(404, `Entry with id ${entryId} not found`);
+    }
+    res.sendStatus(204);
+  } catch (err) {
+    next(err);
+  }
+});
+
 app.listen(process.env.PORT, () => {
   console.log(`express server listening on port ${process.env.PORT}`);
 });

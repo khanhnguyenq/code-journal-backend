@@ -70,7 +70,14 @@ export async function addEntry(entry: UnsavedEntry): Promise<Entry> {
 }
 
 export async function updateEntry(entry: Entry): Promise<Entry> {
-  const res = await fetch(`/api/entries/${entry.entryId}`);
+  const req = {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(entry),
+  };
+  const res = await fetch(`/api/entries/${entry.entryId}`, req);
   if (!res.ok) throw new Error(`fetch Error ${res.status}`);
   return await res.json();
 }
@@ -78,9 +85,6 @@ export async function updateEntry(entry: Entry): Promise<Entry> {
 export async function removeEntry(entryId: number): Promise<void> {
   const req = {
     method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
   };
   const res = await fetch(`/api/entries/${entryId}`, req);
   if (!res.ok) throw new Error(`fetch Error ${res.status}`);
